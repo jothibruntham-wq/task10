@@ -1,0 +1,172 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #090909;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.home {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Main button */
+.order-pull-button {
+  position: relative;
+  width: 280px;
+  height: 62px;
+
+  border: 0;
+  border-radius: 18px;
+
+  background: #ffffff;
+  cursor: pointer;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 8px 30px rgba(0, 0, 0, 0.45);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.order-pull-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.55);
+}
+
+.order-pull-button:active {
+  transform: scale(0.97);
+}
+
+.order-pull-button:disabled {
+  cursor: default;
+}
+
+/* Green/red inner pill */
+.order-pull-button::before {
+  content: "";
+
+  position: absolute;
+  inset: 8px;
+
+  border-radius: 14px;
+
+  background: #ff304f;
+
+  transition:
+    background 0.4s ease,
+    transform 0.4s ease;
+}
+
+.order-pull-button.animate::before {
+  background: #20c76a;
+}
+
+/* Text and truck */
+.button-content {
+  position: relative;
+  z-index: 2;
+
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  color: white;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  letter-spacing: 0.2px;
+}
+
+/* Truck */
+.truck {
+  font-size: 22px;
+  display: inline-block;
+}
+
+/* Truck movement */
+.moving-truck {
+  position: absolute;
+
+  left: -50px;
+
+  animation: truckDelivery 1.8s cubic-bezier(0.45, 0, 0.55, 1)
+    forwards;
+}
+
+/* Text animation */
+.order-pull-button.animate .button-content > span:last-child {
+  animation: textPop 0.45s ease forwards;
+}
+
+/* Truck drives across button */
+@keyframes truckDelivery {
+  0% {
+    left: -55px;
+    transform: scaleX(1);
+  }
+
+  20% {
+    left: 20px;
+  }
+
+  55% {
+    left: 120px;
+  }
+
+  80% {
+    left: 220px;
+  }
+
+  100% {
+    left: 330px;
+    transform: scaleX(1);
+  }
+}
+
+/* Order placed text */
+@keyframes textPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Canvas confetti */
+.confetti-canvas {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  pointer-events: none;
+
+  z-index: 9999;
+}

@@ -4,8 +4,9 @@
 
 body {
   margin: 0;
-  background: #090909;
-  font-family: Arial, Helvetica, sans-serif;
+  background: #0d0f12;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #fff;
 }
 
 .home {
@@ -13,160 +14,280 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: radial-gradient(circle at center, #1b212c 0%, #0a0c10 100%);
 }
 
 /* Main button */
 .order-pull-button {
   position: relative;
-  width: 280px;
-  height: 62px;
-
+  width: 290px;
+  height: 68px;
   border: 0;
-  border-radius: 18px;
-
+  border-radius: 20px;
   background: #ffffff;
   cursor: pointer;
-
   overflow: hidden;
-
+  user-select: none;
+  padding: 0;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.2),
-    0 8px 30px rgba(0, 0, 0, 0.45);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 12px 36px rgba(0, 0, 0, 0.6);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.order-pull-button:hover {
+.order-pull-button:hover:not(:disabled) {
   transform: translateY(-2px);
-
   box-shadow:
-    0 10px 35px rgba(0, 0, 0, 0.55);
+    0 0 0 1px rgba(255, 255, 255, 0.25),
+    0 16px 42px rgba(0, 0, 0, 0.7);
 }
 
-.order-pull-button:active {
-  transform: scale(0.97);
+.order-pull-button:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .order-pull-button:disabled {
   cursor: default;
 }
 
-/* Green/red inner pill */
-.order-pull-button::before {
-  content: "";
-
+/* Inner Background Pill */
+.button-background {
   position: absolute;
-  inset: 8px;
-
-  border-radius: 14px;
-
+  inset: 5px;
+  border-radius: 16px;
   background: #ff304f;
-
-  transition:
-    background 0.4s ease,
-    transform 0.4s ease;
+  transition: background 0.4s ease;
+  z-index: 1;
 }
 
-.order-pull-button.animate::before {
+/* Driving state background: turns into dark asphalt / road atmosphere */
+.order-pull-button.driving .button-background {
+  background: #191c23;
+}
+
+/* Delivered state: turns into success green */
+.order-pull-button.delivered .button-background {
   background: #20c76a;
 }
 
-/* Text and truck */
-.button-content {
-  position: relative;
+/* Attached Road Track */
+.road-track {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  height: 22px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  background: #232730;
+  border-top: 1.5px solid #373d4b;
+  overflow: hidden;
   z-index: 2;
+  transition: opacity 0.35s ease, background 0.4s ease;
+}
 
-  height: 100%;
+/* Road surface subtle depth */
+.road-surface {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.2) 100%);
+}
 
+/* Dashed White Road Lane Markings */
+.road-markings {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 200%;
+  height: 2px;
+  transform: translateY(-50%);
+  background-image: repeating-linear-gradient(
+    90deg,
+    #ffffff,
+    #ffffff 12px,
+    transparent 12px,
+    transparent 24px
+  );
+  opacity: 0.75;
+}
+
+/* Road stripes scroll fast to the left when driving straight forward */
+.order-pull-button.driving .road-markings {
+  animation: roadScroll 0.25s linear infinite;
+  opacity: 1;
+}
+
+@keyframes roadScroll {
+  0% {
+    transform: translate(0, -50%);
+  }
+  100% {
+    transform: translate(-24px, -50%);
+  }
+}
+
+/* Road gently fades away in delivered state */
+.order-pull-button.delivered .road-track {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Truck Wrapper */
+.truck-wrapper {
+  position: absolute;
+  z-index: 5;
+  bottom: 12px; /* Wheels sit directly on the attached road surface */
+  left: 20px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  color: white;
-
-  font-size: 16px;
-  font-weight: 700;
-
-  letter-spacing: 0.2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
-/* Truck */
-.truck {
-  font-size: 22px;
-  display: inline-block;
+/* Subtle hover push forward in idle */
+.order-pull-button.idle:hover .truck-wrapper {
+  transform: translateX(4px);
 }
 
-/* Truck movement */
-.moving-truck {
-  position: absolute;
-
-  left: -50px;
-
-  animation: truckDelivery 1.8s cubic-bezier(0.45, 0, 0.55, 1)
-    forwards;
+/* Truck drives straight forward across button */
+.order-pull-button.driving .truck-wrapper {
+  left: -70px;
+  animation: truckDriveStraight 1.7s cubic-bezier(0.25, 0.8, 0.35, 1) forwards;
 }
 
-/* Text animation */
-.order-pull-button.animate .button-content > span:last-child {
-  animation: textPop 0.45s ease forwards;
+/* Truck is hidden after delivery */
+.order-pull-button.delivered .truck-wrapper {
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* Truck drives across button */
-@keyframes truckDelivery {
+/* Truck Drives Straight Ahead (Left to Right, facing forward) */
+@keyframes truckDriveStraight {
   0% {
-    left: -55px;
-    transform: scaleX(1);
+    left: -70px;
   }
-
   20% {
     left: 20px;
   }
-
   55% {
     left: 120px;
   }
-
   80% {
-    left: 220px;
+    left: 210px;
   }
-
   100% {
-    left: 330px;
-    transform: scaleX(1);
+    left: 320px;
   }
 }
 
-/* Order placed text */
+/* Headlight Beam */
+.headlight-beam {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.order-pull-button.driving .headlight-beam {
+  opacity: 1;
+  animation: beamGlow 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes beamGlow {
+  0% { opacity: 0.75; }
+  100% { opacity: 1; }
+}
+
+/* Wheel Rotation */
+.order-pull-button.driving .wheel {
+  animation: wheelSpin 0.3s linear infinite;
+}
+
+.wheel-back {
+  transform-origin: 13px 27px;
+}
+
+.wheel-front {
+  transform-origin: 45px 27px;
+}
+
+@keyframes wheelSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Gentle bounce while driving on road */
+.order-pull-button.driving .truck-svg {
+  animation: truckSuspension 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes truckSuspension {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-1.5px);
+  }
+}
+
+/* Button Content */
+.button-content {
+  position: relative;
+  z-index: 4;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 12px; /* Space above road */
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+/* Idle Text */
+.order-text {
+  margin-left: 38px; /* Balanced spacing with idle truck */
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Dispatching / Driving Text */
+.dispatching-text {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.75);
+  animation: fadeIn 0.3s ease;
+}
+
+/* Delivered Content */
+.delivered-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  animation: textPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.check-svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
 @keyframes textPop {
   0% {
     opacity: 0;
-    transform: scale(0.7);
+    transform: scale(0.65);
   }
-
-  60% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-
   100% {
     opacity: 1;
     transform: scale(1);
   }
 }
 
-/* Canvas confetti */
-.confetti-canvas {
-  position: fixed;
-
-  inset: 0;
-
-  width: 100vw;
-  height: 100vh;
-
-  pointer-events: none;
-
-  z-index: 9999;
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
